@@ -35,7 +35,7 @@ export async function RecordsTable() {
           <TableRow key={record.id}>
             <TableCell className="font-medium">{record.id}</TableCell>
             <TableCell>{record.member.name}</TableCell>
-            <TableCell>{record.donated_date.toDateString()}</TableCell>
+            <TableCell>{record.donated_date.toLocaleDateString()}</TableCell>
             <TableCell className="text-right">
               Rs {record.donated_amount}
             </TableCell>
