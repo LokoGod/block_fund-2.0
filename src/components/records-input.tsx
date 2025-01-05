@@ -1,6 +1,6 @@
-import * as React from "react"
+import * as React from "react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,67 +8,78 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
+import { prisma } from "@/app/lib/db";
+import { addRecord } from "@/actions/actions";
 
-export function RecordsInput() {
+export async function RecordsInput() {
+  const members = await prisma.members.findMany();
+  const months = await prisma.months.findMany();
+
   return (
     <Card className="w-[350px]">
       <CardHeader>
         <CardTitle>Add a record</CardTitle>
-        <CardDescription>Put in the details of the latest donation.</CardDescription>
+        <CardDescription>
+          Put in the details of the latest donation.
+        </CardDescription>
       </CardHeader>
+      <form action={addRecord}>
       <CardContent>
-        <form>
+        
           <div className="grid w-full items-center gap-4">
             
-          <div className="flex flex-col space-y-1.5">
+            <div className="flex flex-col space-y-1.5">
               <Label htmlFor="framework">Member</Label>
-              <Select>
+              <Select name="memberId">
                 <SelectTrigger id="framework">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
+                  {members.map((member) => (
+                    <SelectItem key={member.id} value={member.id.toString()}>
+                      {member.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="framework">Month</Label>
-              <Select>
+             <Select name="monthId">
                 <SelectTrigger id="framework">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
+                  {months.map((month) => (
+                    <SelectItem key={month.id} value={month.id.toString()}>
+                      {month.month_title}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="amount">Amount</Label>
-              <Input type="number" id="amount" placeholder="Rs." />
+              <Input type="number" id="amount" name="amount" placeholder="Rs." />
             </div>
-            
           </div>
-        </form>
       </CardContent>
       <CardFooter className="flex justify-center">
-        <Button>Publish</Button>
+        <Button type="submit">Publish</Button>
       </CardFooter>
+      </form>
+
     </Card>
-  )
+  );
 }
