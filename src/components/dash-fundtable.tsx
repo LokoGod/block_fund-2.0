@@ -55,9 +55,15 @@ import {
   ]
   
   export function FundTable() {
+
+    const date = new Date();
+    const month = date.toLocaleString('default', { month: 'long' });
+    const year = date.getFullYear();
+    
     return (
       <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableCaption>A list of the recent donations.<a href="previousDonations" className="underline underline-offset-1">view previous</a>.</TableCaption>
+        
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Invoice</TableHead>
