@@ -10,9 +10,9 @@ import {
   
   export function FundTablePrevious() {
 
-    const date = new Date();
-    const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear();
+    // const date = new Date();
+    // const month = date.toLocaleString('default', { month: 'long' });
+    // const year = date.getFullYear();
     
     return (
         <Table>

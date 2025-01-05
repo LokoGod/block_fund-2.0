@@ -4,16 +4,16 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
+  // TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
 export async function RecordsTable() {
-  const date = new Date();
-  const month = date.toLocaleString("default", { month: "long" });
-  const year = date.getFullYear();
+  // const date = new Date();
+  // const month = date.toLocaleString("default", { month: "long" });
+  // const year = date.getFullYear();
 
   const records = await prisma.fundTransaction.findMany({ include: {
     member: true,

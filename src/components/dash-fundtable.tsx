@@ -13,7 +13,7 @@ import {
 
     const date = new Date();
     const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear();
+    // const year = date.getFullYear();
 
       // Query to fetch records for the current month and year
     const records = await prisma.fundTransaction.findMany({
