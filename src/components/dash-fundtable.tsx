@@ -1,3 +1,4 @@
+import { prisma } from "@/app/lib/db";
 import {
     Table,
     TableBody,
@@ -9,86 +10,64 @@ import {
     TableRow,
   } from "@/components/ui/table"
   
-  const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
-    },
-  ]
-  
-  export function FundTable() {
+  export async function FundTable() {
 
     const date = new Date();
     const month = date.toLocaleString('default', { month: 'long' });
     const year = date.getFullYear();
+
+      // Query to fetch records for the current month and year
+    const records = await prisma.fundTransaction.findMany({
+      where: {
+          month: {
+              month_title: month.toString(), // Assuming `month_title` stores month number as string (e.g., "1" for January)
+          },
+          monthId: {
+              in: await prisma.months.findMany({
+                  where: {
+                      month_title: month.toString(),
+                  },
+                  select: { id: true },
+              }).then((months) => months.map((month) => month.id)),
+          },
+      },
+      include: {
+          member: true,
+      },
+  });
+
+  // Calculate the total donation amount for the current month
+  const recordTotal = records.reduce((total, record) => total + record.donated_amount, 0);
+
     
     return (
       <Table>
-        <TableCaption>A list of the recent donations.<a href="previousDonations" className="underline underline-offset-1">view previous</a>.</TableCaption>
-        
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Invoice</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+      <TableCaption>A list of the recent donations.<a href="previousDonations" className="underline underline-offset-1">view previous</a>.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">Donation ID</TableHead>
+          <TableHead>Member</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {records.map((record) => (
+          <TableRow key={record.id}>
+            <TableCell className="font-medium">{record.id}</TableCell>
+            <TableCell>{record.member.name}</TableCell>
+            <TableCell>{record.donated_date.toLocaleDateString()}</TableCell>
+            <TableCell className="text-right">
+              Rs {record.donated_amount}
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invoices.map((invoice) => (
-            <TableRow key={invoice.invoice}>
-              <TableCell className="font-medium">{invoice.invoice}</TableCell>
-              <TableCell>{invoice.paymentStatus}</TableCell>
-              <TableCell>{invoice.paymentMethod}</TableCell>
-              <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
-            <TableCell className="text-right">$2,500.00</TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+        ))}
+        <TableRow>
+          <TableCell colSpan={3}>Total</TableCell>
+          <TableCell className="text-right">Rs {recordTotal}</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
     )
   }
   
